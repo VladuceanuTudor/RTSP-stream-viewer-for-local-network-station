@@ -1,0 +1,219 @@
+.recording-panel {
+  background: #1a1f3a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.recording-panel h3 {
+  color: #667eea;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recording-status {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.recording-active {
+  background: rgba(245, 101, 101, 0.2);
+  border: 2px solid #f56565;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.recording-idle {
+  background: rgba(160, 174, 192, 0.1);
+  border: 2px solid #4a5568;
+}
+
+.rec-indicator {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f56565;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.rec-time {
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: #fff;
+}
+
+.recording-controls {
+  margin-bottom: 1.5rem;
+}
+
+.btn-record {
+  background: #f56565;
+  color: white;
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-record:hover:not(:disabled) {
+  background: #e53e3e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(245, 101, 101, 0.4);
+}
+
+.btn-record:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-stop {
+  background: #4a5568;
+  color: white;
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-stop:hover {
+  background: #2d3748;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.recorded-files {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #0f1429;
+  border-radius: 8px;
+  border: 1px solid #2d3748;
+}
+
+.recorded-files h4 {
+  color: #667eea;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem;
+  background: #1a1f3a;
+  border-radius: 6px;
+  border: 1px solid #2d3748;
+  gap: 1rem;
+}
+
+.file-item span {
+  font-size: 0.85rem;
+  color: #cbd5e0;
+  flex: 1;
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+.btn-download {
+  background: #48bb78;
+  color: white;
+}
+
+.btn-download:hover {
+  background: #38a169;
+  transform: translateY(-1px);
+}
+
+.btn-delete {
+  background: #f56565;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #e53e3e;
+  transform: translateY(-1px);
+}
+
+.recording-info {
+  padding: 1rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.recording-info h4 {
+  color: #667eea;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.recording-info ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.recording-info li {
+  padding: 0.3rem 0;
+  color: #cbd5e0;
+  font-size: 0.85rem;
+}
+
+.recording-info li::before {
+  content: "• ";
+  color: #667eea;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.note {
+  font-size: 0.85rem;
+  color: #a0aec0;
+  line-height: 1.5;
+  margin: 0;
+}

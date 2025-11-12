@@ -1,0 +1,55 @@
+# MediaMTX Configuration pentru proiectul RTSP 360°
+# Acest server preia stream RTSP de la Jetson și îl face disponibil prin WebRTC
+
+# Setări generale
+logLevel: info
+logDestinations: [stdout]
+
+# API HTTP pentru monitoring (opțional)
+api: yes
+apiAddress: :9997
+
+# Setări pentru metrici (opțional)
+metrics: yes
+metricsAddress: :9998
+
+# Path-uri (surse video)
+paths:
+  # Path pentru stream-ul de la Jetson
+  jetson360:
+    # Sursa RTSP de la Jetson (înlocuiește IP-ul cu cel al Jetson-ului tău)
+    source: rtsp://192.168.1.100:8554/video360
+    sourceProtocol: automatic
+    sourceOnDemand: no
+    runOnReady: echo "Stream jetson360 is ready"
+    runOnNotReady: echo "Stream jetson360 is not ready"
+
+# Setări WebRTC (pentru browser)
+webrtc: yes
+webrtcAddress: :8889
+webrtcServerKey: server.key
+webrtcServerCert: server.crt
+# ICE Servers pentru WebRTC (folosim STUN public pentru LAN)
+webrtcICEServers2:
+  - urls: [stun:stun.l.google.com:19302]
+
+# Setări RTSP (pentru a expune și stream-ul înapoi dacă e nevoie)
+rtsp: yes
+rtspAddress: :8554
+protocols: [tcp, udp]
+
+# Setări HLS (opțional, ca fallback pentru browsere mai vechi)
+hls: yes
+hlsAddress: :8888
+hlsVariant: mpegts
+hlsSegmentCount: 7
+hlsSegmentDuration: 1s
+hlsPartDuration: 200ms
+hlsAllowOrigin: '*'
+
+# Setări pentru recording (dacă vrei să salvezi automat pe server)
+# paths:
+#   jetson360:
+#     record: yes
+#     recordPath: /recordings/%path/%Y-%m-%d_%H-%M-%S
+#     recordFormat: mp4

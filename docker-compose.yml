@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # MediaMTX Server - convertește RTSP în WebRTC
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: mediamtx-server
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml
+      - ./recordings:/recordings
+    environment:
+      - MTX_LOGLEVEL=info
+    ports:
+      - "8554:8554"    # RTSP
+      - "8888:8888"    # HLS
+      - "8889:8889"    # WebRTC
+      - "9997:9997"    # API
+      - "9998:9998"    # Metrics
+
+  # React App - interfața web pentru vizualizare
+  react-viewer:
+    build:
+      context: ./react-viewer
+      dockerfile: Dockerfile
+    container_name: react-viewer-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_MEDIAMTX_HOST=${MEDIAMTX_HOST:-localhost}
+      - REACT_APP_WEBRTC_PORT=8889
+      - REACT_APP_HLS_PORT=8888
+    depends_on:
+      - mediamtx
+
+  # Nginx (opțional) - pentru servire statică în producție
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: nginx-rtsp-viewer
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./react-viewer/build:/usr/share/nginx/html
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #   depends_on:
+  #     - mediamtx
+
+volumes:
+  recordings:
+    driver: local
