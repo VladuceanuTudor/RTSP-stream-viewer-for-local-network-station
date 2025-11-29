@@ -18,7 +18,7 @@ paths:
   # Path pentru stream-ul de la Jetson
   jetson360:
     # Sursa RTSP de la Jetson (înlocuiește IP-ul cu cel al Jetson-ului tău)
-    source: rtsp://192.168.1.100:8554/video360
+    # source: rtsp://192.168.1.100:8554/video360
     sourceProtocol: automatic
     sourceOnDemand: no
     runOnReady: echo "Stream jetson360 is ready"
@@ -30,8 +30,8 @@ webrtcAddress: :8889
 webrtcServerKey: server.key
 webrtcServerCert: server.crt
 # ICE Servers pentru WebRTC (folosim STUN public pentru LAN)
-webrtcICEServers2:
-  - urls: [stun:stun.l.google.com:19302]
+webrtcICEServers: 
+- stun:stun.l.google.com:19302
 
 # Setări RTSP (pentru a expune și stream-ul înapoi dacă e nevoie)
 rtsp: yes

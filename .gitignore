@@ -1,0 +1,5 @@
+react-viewer/node_modules/
+react-viewer/build/
+react-viewer/.cache/
+mediamtx/server.key
+.test*

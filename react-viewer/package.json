@@ -4,12 +4,13 @@
   "description": "360° RTSP Stream Viewer cu salvare locală",
   "private": true,
   "dependencies": {
+    "@react-three/drei": "^9.88.0",
+    "@react-three/fiber": "^8.15.0",
+    "hls.js": "^1.6.15",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "three": "^0.158.0",
-    "@react-three/fiber": "^8.15.0",
-    "@react-three/drei": "^9.88.0"
+    "three": "^0.181.2"
   },
   "scripts": {
     "start": "react-scripts start",
