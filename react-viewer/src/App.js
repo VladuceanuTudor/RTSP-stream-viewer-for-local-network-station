@@ -11,7 +11,7 @@ function App() {
   const [streamType, setStreamType] = useState('webrtc'); // 'webrtc' sau 'hls'
   const videoRef = useRef(null);
   const pcRef = useRef(null);
-  const hlsRef = useRef(null); // La început cu celelalte ref-uri
+  const hlsRef = useRef(null);
 
   // Configurare din environment variables
   const MEDIAMTX_HOST = process.env.REACT_APP_MEDIAMTX_HOST || 'localhost';
@@ -20,6 +20,12 @@ function App() {
   const STREAM_PATH = 'jetson360';
 
   const connectToStream = async (type) => {
+    // Deconectează stream-ul anterior mai întâi
+    disconnectStream();
+    
+    // Așteaptă un pic pentru cleanup complet
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     setStreamType(type);
     
     if (type === 'webrtc') {
@@ -27,22 +33,45 @@ function App() {
       const webrtcUrl = `http://${MEDIAMTX_HOST}:${WEBRTC_PORT}/${STREAM_PATH}/whep`;
       await connectWebRTC(webrtcUrl);
     } else if (type === 'hls') {
-    const hlsUrl = `http://${MEDIAMTX_HOST}:${HLS_PORT}/${STREAM_PATH}/index.m3u8`;
-    
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(videoRef.current);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        videoRef.current.play();
-        setIsConnected(true);
-      });
-    } else {
-      // Safari native support
-      videoRef.current.src = hlsUrl;
-      setIsConnected(true);
+      const hlsUrl = `http://${MEDIAMTX_HOST}:${HLS_PORT}/${STREAM_PATH}/index.m3u8`;
+      
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hlsRef.current = hls; // Salvează referința
+        
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(videoRef.current);
+        
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          console.log('HLS manifest parsed, starting playback...');
+          videoRef.current.play()
+            .then(() => {
+              console.log('HLS playback started');
+              setIsConnected(true);
+              setStreamUrl(hlsUrl);
+            })
+            .catch(e => console.error('HLS play error:', e));
+        });
+        
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.error('HLS error:', data);
+          if (data.fatal) {
+            setIsConnected(false);
+          }
+        });
+      } else {
+        // Safari native support
+        videoRef.current.src = hlsUrl;
+        videoRef.current.play()
+          .then(() => {
+            console.log('Native HLS playback started');
+            setIsConnected(true);
+            setStreamUrl(hlsUrl);
+          })
+          .catch(e => console.error('Native HLS play error:', e));
+      }
     }
-  }};
+  };
 
   const connectWebRTC = async (url) => {
     try {
@@ -80,7 +109,9 @@ function App() {
               console.error('Play error:', e);
               // Încearcă din nou după un delay mic
               setTimeout(() => {
-                videoRef.current.play().catch(err => console.error('Retry play error:', err));
+                if (videoRef.current) {
+                  videoRef.current.play().catch(err => console.error('Retry play error:', err));
+                }
               }, 100);
             });
           
@@ -132,7 +163,16 @@ function App() {
   };
 
   const disconnectStream = () => {
-    // Oprește toate track-urile
+    console.log('Deconectare stream...');
+    
+    // Oprește HLS dacă există
+    if (hlsRef.current) {
+      console.log('Destroying HLS...');
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    // Oprește WebRTC tracks
     if (videoRef.current) {
       if (videoRef.current.srcObject) {
         videoRef.current.srcObject.getTracks().forEach(track => {
@@ -142,11 +182,13 @@ function App() {
         videoRef.current.srcObject = null;
       }
       videoRef.current.src = '';
+      videoRef.current.pause();
       videoRef.current.load();
     }
 
     // Închide RTCPeerConnection
     if (pcRef.current) {
+      console.log('Closing RTCPeerConnection...');
       pcRef.current.close();
       pcRef.current = null;
     }
@@ -165,44 +207,44 @@ function App() {
 
   return (
     <div className="App">
-    <header className="App-header">
-      <h1>🎥 Vizualizator Stream 360° RTSP</h1>
-      <p>Proiect procesare video panoramic - Vladuceanu Tudor</p>
-    </header>
+      <header className="App-header">
+        <h1>🎥 Vizualizator Stream 360° RTSP</h1>
+        <p>Proiect procesare video panoramic - Vladuceanu Tudor</p>
+      </header>
 
-    {/* Video element ÎNTOTDEAUNA prezent (ascuns) */}
-    <video
-      ref={videoRef}
-      autoPlay
-      playsInline
-      muted
-      style={{ display: 'none' }}
-    />
+      {/* Video element ÎNTOTDEAUNA prezent (ascuns) */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        style={{ display: 'none' }}
+      />
 
-    <div className="app-container">
-      <div className="sidebar">
-        <StreamController
-          isConnected={isConnected}
-          streamType={streamType}
-          onConnect={connectToStream}
-          onDisconnect={disconnectStream}
-          mediamtxHost={MEDIAMTX_HOST}
-        />
-        
-        <RecordingPanel
-          videoRef={videoRef}
-          isConnected={isConnected}
-        />
-      </div>
-
-      <div className="main-content">
-        {isConnected ? (
-          <Video360Viewer
-            videoRef={videoRef}
-            streamUrl={streamUrl}
+      <div className="app-container">
+        <div className="sidebar">
+          <StreamController
+            isConnected={isConnected}
             streamType={streamType}
+            onConnect={connectToStream}
+            onDisconnect={disconnectStream}
+            mediamtxHost={MEDIAMTX_HOST}
           />
-        ) : (
+          
+          <RecordingPanel
+            videoRef={videoRef}
+            isConnected={isConnected}
+          />
+        </div>
+
+        <div className="main-content">
+          {isConnected ? (
+            <Video360Viewer
+              videoRef={videoRef}
+              streamUrl={streamUrl}
+              streamType={streamType}
+            />
+          ) : (
             <div className="no-stream">
               <div className="placeholder">
                 <h2>📡 Niciun stream conectat</h2>
@@ -212,9 +254,14 @@ function App() {
                   <ol>
                     <li>Asigură-te că MediaMTX server rulează (port 8889 pentru WebRTC)</li>
                     <li>Verifică că Jetson trimite stream RTSP la MediaMTX</li>
-                    <li>Apasă "Conectare WebRTC" pentru latență minimă</li>
-                    <li>Sau folosește "Conectare HLS" ca fallback</li>
+                    <li>Apasă "Conectare WebRTC" pentru latență minimă (~100ms)</li>
+                    <li>Sau folosește "Conectare HLS" ca fallback (~3-5s latență)</li>
                   </ol>
+                  <div style={{ marginTop: '20px', padding: '10px', background: 'rgba(255,255,255,0.1)', borderRadius: '5px' }}>
+                    <p><strong>💡 Protocol info:</strong></p>
+                    <p>• <strong>WebRTC:</strong> Real-time, latență ~100ms, peer-to-peer</p>
+                    <p>• <strong>HLS:</strong> HTTP-based, latență 3-5s, fallback universal</p>
+                  </div>
                 </div>
               </div>
             </div>
