@@ -6,7 +6,7 @@ import * as THREE from 'three';
 function VideoSphere({ videoRef }) {
   const meshRef = useRef();
   const [texture, setTexture] = useState(null);
-
+  
   useEffect(() => {
     console.log('VideoSphere mounted');
     
@@ -26,13 +26,13 @@ function VideoSphere({ videoRef }) {
     console.log('✅ Texture created!');
     
   }, [videoRef]);
-
+  
   useFrame(() => {
     if (texture) {
       texture.needsUpdate = true;
     }
   });
-
+  
   return (
     <mesh ref={meshRef} scale={[-1, 1, 1]}>
       <sphereGeometry args={[500, 60, 40]} />
@@ -47,11 +47,21 @@ function VideoSphere({ videoRef }) {
 export default function Video360Viewer({ videoRef }) {
   return (
     <div style={{ width: '100%', height: '100vh' }}>
-      <Canvas camera={{ fov: 75, position: [0, 0, 0.1] }}>
+      <Canvas 
+        camera={{ 
+          fov: 85,              // ✅ Crescut de la 75 → 90 (mai wide!)
+          aspect: window.innerWidth / window.innerHeight,  // ✅ Aspect ratio corect
+          position: [0, 0, 0.1] 
+        }}
+      >
         <VideoSphere videoRef={videoRef} />
         <OrbitControls 
           enableZoom={true}
+          enableDamping={true}      // ✅ Smooth movement
+          dampingFactor={0.05}      // ✅ Smooth deceleration
           rotateSpeed={-0.5}
+          minDistance={0.1}         // ✅ Permite zoom foarte aproape
+          maxDistance={1000}        // ✅ Permite zoom departe
         />
       </Canvas>
     </div>
