@@ -6,7 +6,7 @@ services:
     image: bluenviron/mediamtx:latest
     container_name: mediamtx-server
     restart: unless-stopped
-    network_mode: host
+    #network_mode: host
     volumes:
       - ./mediamtx/mediamtx.yml:/mediamtx.yml
       - ./recordings:/recordings
@@ -20,20 +20,20 @@ services:
       - "9998:9998"    # Metrics
 
   # React App - interfața web pentru vizualizare
-  react-viewer:
-    build:
-      context: ./react-viewer
-      dockerfile: Dockerfile
-    container_name: react-viewer-app
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      - REACT_APP_MEDIAMTX_HOST=${MEDIAMTX_HOST:-localhost}
-      - REACT_APP_WEBRTC_PORT=8889
-      - REACT_APP_HLS_PORT=8888
-    depends_on:
-      - mediamtx
+  # react-viewer:
+  #   build:
+  #     context: ./react-viewer
+  #     dockerfile: Dockerfile
+  #   container_name: react-viewer-app
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - REACT_APP_MEDIAMTX_HOST=${MEDIAMTX_HOST:-localhost}
+  #     - REACT_APP_WEBRTC_PORT=8889
+  #     - REACT_APP_HLS_PORT=8888
+  #   depends_on:
+  #     - mediamtx
 
   # Nginx (opțional) - pentru servire statică în producție
   # nginx:
